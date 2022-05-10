@@ -53,11 +53,18 @@ def add_ssh_key(ip):
 
 
 # Connect with ssh key
+# Sometimes fails because paramiko bug: 
+# https://stackoverflow.com/questions/70565357/paramiko-authentication-fails-with-agreed-upon-rsa-sha2-512-pubkey-algorithm
+# https://github.com/paramiko/paramiko/issues/1961
 def ssh_key(ip):
     try:
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(hostname=ip, port=22, username = "ahernandez", key_filename='id_rsa', timeout=5)
+
+        # To solve de bug
+        # ssh.connect(hostname=ip, port=22, username = "ahernandez", key_filename='id_rsa', timeout=5, disabled_algorithms=dict(pubkeys=["rsa-sha2-512", "rsa-sha2-256"]))
+        
         # stdin,stdout,stderr = ssh.exec_command("date")
         # print(stderr.read())
         print('%s\tOK'%(ip))
